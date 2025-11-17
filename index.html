@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Painel Público – Materiais de Limpeza</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Estilo "gov" simples, com azul institucional -->
+  <style>
+    :root {
+      --azul-gov: #1351b4;
+      --azul-escuro: #0b2a66;
+      --cinza-fundo: #f3f4f6;
+      --cinza-card: #ffffff;
+      --cinza-texto: #374151;
+      --verde: #1b8755;
+      --vermelho: #c53030;
+      --amarelo: #e9b100;
+      --bordaradius: 10px;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--cinza-fundo);
+      color: var(--cinza-texto);
+      line-height: 1.4;
+    }
+
+    header {
+      background: linear-gradient(90deg, var(--azul-escuro), var(--azul-gov));
+      color: #fff;
+      padding: 18px 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .header-content {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .header-titulo {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .header-subtitulo {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 1080px;
+      margin: 18px auto 32px;
+      padding: 0 16px 16px;
+    }
+
+    .secao-titulo {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--azul-escuro);
+    }
+
+    .cards-resumo {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .card {
+      background: var(--cinza-card);
+      border-radius: var(--bordaradius);
+      padding: 12px 14px;
+      box-shadow: var(--shadow);
+      border-left: 4px solid var(--azul-gov);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .card--verde {
+      border-left-color: var(--verde);
+    }
+    .card--vermelho {
+      border-left-color: var(--vermelho);
+    }
+    .card--amarelo {
+      border-left-color: var(--amarelo);
+    }
+
+    .card-titulo {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #6b7280;
+    }
+
+    .card-valor {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--azul-escuro);
+    }
+
+    .card-legenda {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .grid-conteudo {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 2fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-conteudo {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .bloco {
+      background: var(--cinza-card);
+      border-radius: var(--bordaradius);
+      padding: 14px 16px 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .bloco + .bloco {
+      margin-top: 14px;
+    }
+
+    .bloco-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 4px;
+    }
+
+    .bloco-titulo {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--azul-escuro);
+    }
+
+    .bloco-subtitulo {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
+
+    thead {
+      background: #e5f0ff;
+    }
+
+    th, td {
+      padding: 8px 6px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    th {
+      font-weight: 600;
+      color: #374151;
+      font-size: 0.8rem;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f9fafb;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .tag--alerta {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .tag--ok {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    canvas {
+      max-width: 100%;
+    }
+
+    footer {
+      max-width: 1080px;
+      margin: 0 auto 24px;
+      padding: 0 16px;
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    footer p {
+      margin-top: 8px;
+    }
+  </style>
+
+  <!-- Chart.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-titulo">
+        Painel Público – Materiais de Limpeza
+      </div>
+      <div class="header-subtitulo">
+        Consolidação das informações de 5 unidades de saúde, a partir das planilhas de outubro/2025.
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- RESUMO GERAL -->
+    <section>
+      <h2 class="secao-titulo">Resumo geral das unidades</h2>
+
+      <div class="cards-resumo">
+        <div class="card">
+          <div class="card-titulo">Total de unidades</div>
+          <div class="card-valor" id="totalUnidades">5</div>
+          <div class="card-legenda">Cais e ambulatórios analisados.</div>
+        </div>
+
+        <div class="card card--amarelo">
+          <div class="card-titulo">Total de itens cadastrados</div>
+          <div class="card-valor" id="totalItens">121</div>
+          <div class="card-legenda">Soma de todos os produtos listados nas 5 planilhas.</div>
+        </div>
+
+        <div class="card card--vermelho">
+          <div class="card-titulo">Itens sem quantidade informada</div>
+          <div class="card-valor" id="itensSemInfo">121</div>
+          <div class="card-legenda">
+            Nenhum item teve a coluna de "Quantidade disponibilizada" preenchida.
+          </div>
+        </div>
+
+        <div class="card card--verde">
+          <div class="card-titulo">Sugestões registradas</div>
+          <div class="card-valor" id="totalSugestoes">10</div>
+          <div class="card-legenda">Espaço de sugestões utilizado em todas as unidades.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABELA + GRÁFICOS -->
+    <section class="grid-conteudo">
+      <!-- Tabela por unidade -->
+      <div class="bloco">
+        <div class="bloco-header">
+          <div>
+            <div class="bloco-titulo">Indicadores por unidade</div>
+            <div class="bloco-subtitulo">
+              Quantidade de itens cadastrados, preenchimento de dados e uso de sugestões.
+            </div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Unidade</th>
+              <th>Itens cadastrados</th>
+              <th>Itens com quantidade informada</th>
+              <th>Itens sem informação</th>
+              <th>Sugestões registradas</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaUnidades">
+            <!-- preenchido via JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Gráfico de barras -->
+      <div class="bloco">
+        <div class="bloco-header">
+          <div>
+            <div class="bloco-titulo">Comparativo entre unidades</div>
+            <div class="bloco-subtitulo">
+              Total de itens cadastrados e sugestões por unidade.
+            </div>
+          </div>
+        </div>
+
+        <canvas id="graficoItens"></canvas>
+        <br />
+        <canvas id="graficoSugestoes"></canvas>
+      </div>
+    </section>
+
+    <!-- Gráfico de preenchimento -->
+    <section style="margin-top: 18px;">
+      <div class="bloco">
+        <div class="bloco-header">
+          <div>
+            <div class="bloco-titulo">Preenchimento das quantidades</div>
+            <div class="bloco-subtitulo">
+              Relação entre itens com quantidade informada e itens sem preenchimento.
+            </div>
+          </div>
+          <span class="tag tag--alerta">
+            Atenção: 100% dos itens sem quantidade
+          </span>
+        </div>
+
+        <canvas id="graficoPreenchimento"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      Dados consolidados a partir das planilhas:
+      Cais Dr. Erwin Crussius – Hípica, Cais Dr. Cyrio Nacul – Petrópolis,
+      Ambulatório Pulador, Ambulatório Especialidades e Ambulatório Capinzal (outubro/2025).
+    </p>
+    <p>
+      Painel público demonstrativo para fins acadêmicos, utilizando HTML, CSS e JavaScript.
+    </p>
+  </footer>
+
+  <script>
+    // -----------------------------
+    // DADOS CONSOLIDADOS
+    // -----------------------------
+    const unidades = [
+      "Cais Dr. Erwin Crussius – Hípica",
+      "Cais Dr. Cyrio Nacul – Petrópolis",
+      "Ambulatório Pulador",
+      "Ambulatório Especialidades",
+      "Ambulatório Capinzal"
+    ];
+
+    // Itens estimados por planilha (conforme leitura dos Excel)
+    const itensPorUnidade = [24, 24, 24, 25, 24];
+
+    // Nenhuma quantidade preenchida nas planilhas (0 para todos)
+    const itensComQuantidade = [0, 0, 0, 0, 0];
+
+    // Itens sem informação = total - com quantidade
+    const itensSemInfo = itensPorUnidade.map((total, idx) => {
+      return total - itensComQuantidade[idx];
+    });
+
+    // Sugestões preenchidas (2 em cada unidade)
+    const sugestoesPorUnidade = [2, 2, 2, 2, 2];
+
+    // Totais gerais
+    const totalItens = itensPorUnidade.reduce((acc, v) => acc + v, 0);
+    const totalSugestoes = sugestoesPorUnidade.reduce((acc, v) => acc + v, 0);
+    const totalItensComQuantidade = itensComQuantidade.reduce((acc, v) => acc + v, 0);
+    const totalItensSemInfo = itensSemInfo.reduce((acc, v) => acc + v, 0);
+
+    // Preenche os cards
+    document.getElementById("totalUnidades").textContent = unidades.length;
+    document.getElementById("totalItens").textContent = totalItens;
+    document.getElementById("totalSugestoes").textContent = totalSugestoes;
+    document.getElementById("itensSemInfo").textContent = totalItensSemInfo;
+
+    // -----------------------------
+    // TABELA POR UNIDADE
+    // -----------------------------
+    const corpoTabela = document.getElementById("tabelaUnidades");
+
+    unidades.forEach((unidade, index) => {
+      const tr = document.createElement("tr");
+
+      const tdUnidade = document.createElement("td");
+      tdUnidade.textContent = unidade;
+
+      const tdItens = document.createElement("td");
+      tdItens.textContent = itensPorUnidade[index];
+
+      const tdComQtd = document.createElement("td");
+      tdComQtd.textContent = itensComQuantidade[index];
+
+      const tdSemInfo = document.createElement("td");
+      tdSemInfo.textContent = itensSemInfo[index];
+
+      const tdSugestoes = document.createElement("td");
+      tdSugestoes.textContent = sugestoesPorUnidade[index];
+
+      tr.appendChild(tdUnidade);
+      tr.appendChild(tdItens);
+      tr.appendChild(tdComQtd);
+      tr.appendChild(tdSemInfo);
+      tr.appendChild(tdSugestoes);
+
+      corpoTabela.appendChild(tr);
+    });
+
+    // -----------------------------
+    // GRÁFICO – ITENS POR UNIDADE
+    // -----------------------------
+    const ctxItens = document.getElementById("graficoItens").getContext("2d");
+    new Chart(ctxItens, {
+      type: "bar",
+      data: {
+        labels: unidades,
+        datasets: [
+          {
+            label: "Itens cadastrados",
+            data: itensPorUnidade
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: true
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              font: { size: 10 }
+            }
+          }
+        }
+      }
+    });
+
+    // -----------------------------
+    // GRÁFICO – SUGESTÕES POR UNIDADE
+    // -----------------------------
+    const ctxSugestoes = document.getElementById("graficoSugestoes").getContext("2d");
+    new Chart(ctxSugestoes, {
+      type: "bar",
+      data: {
+        labels: unidades,
+        datasets: [
+          {
+            label: "Sugestões registradas",
+            data: sugestoesPorUnidade
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: true
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              font: { size: 10 }
+            }
+          }
+        }
+      }
+    });
+
+    // -----------------------------
+    // GRÁFICO – PREENCHIMENTO
+    // -----------------------------
+    const ctxPreenchimento = document.getElementById("graficoPreenchimento").getContext("2d");
+    new Chart(ctxPreenchimento, {
+      type: "doughnut",
+      data: {
+        labels: ["Itens com quantidade informada", "Itens sem informação"],
+        datasets: [
+          {
+            data: [totalItensComQuantidade, totalItensSemInfo]
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "bottom"
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
